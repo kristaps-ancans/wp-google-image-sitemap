@@ -1,0 +1,1 @@
+# wp-google-image-sitemap
