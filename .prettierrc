@@ -1,0 +1,28 @@
+{
+    "singleQuote": true,
+    "bracketSpacing": true,
+    "stylelintIntegration": true,
+    "tslintIntegration ": true,
+    "arrowParens": "avoid",
+    "trailingComma": "es5",
+    "printWidth": 120,
+    "useTabs": false,
+    "tabWidth": 4,
+    "semi": true,
+    "quoteProps": "consistent",
+    "endOfLine": "lf",
+    "overrides": [
+        {
+            "files": "*.html",
+            "options": {
+                "printWidth": 160
+            }
+        },
+        {
+            "files": "*.php",
+            "options": {
+                "printWidth": 160
+            }
+        }
+    ]
+}
