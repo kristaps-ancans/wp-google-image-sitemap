@@ -20,10 +20,7 @@ add_action('admin_menu', 'image_sitemap_generate_page');
 // Add Generate Sitemap link in Plugins list
 function image_sitemap_action_links($links)
 {
-
-    $links = array_merge(array(
-        '<a href="' . esc_url('tools.php?page=image-sitemap-generate-page') . '">' . __('Generate Sitemap', 'textdomain') . '</a>'
-    ), $links);
+    $links = array_merge(['<a href="' . esc_url('tools.php?page=image-sitemap-generate-page') . '">' . __('Generate Sitemap', 'textdomain') . '</a>'], $links);
 
     return $links;
 }
@@ -52,22 +49,25 @@ function IsImageSitemapWritable($filename)
 
 function EscapeXMLEntities($xml)
 {
-    return str_replace(array('&', '<', '>', '\'', '"'), array('&amp;', '&lt;', '&gt;', '&apos;', '&quot;'), $xml);
+    return str_replace(['&', '<', '>', '\'', '"'], ['&amp;', '&lt;', '&gt;', '&apos;', '&quot;'], $xml);
 }
 
 function image_sitemap_generate()
 {
     if (isset($_POST['submit'])) {
+
         $st = image_sitemap_loop();
 
         if (!$st) {
-            echo '<div class="notice notice-error"><h2>Oops!</h2><p>The XML sitemap was generated successfully but the  plugin was unable to save the xml to your WordPress root folder at <strong>' . $_SERVER["DOCUMENT_ROOT"] . '</strong>.</p><p>Please ensure that the folder has appropriate <a href="http://codex.wordpress.org/Changing_File_Permissions" target="_blank">write permissions</a>.</p><p> You can either use the chmod command in Unix or use your FTP Manager to change the permission of the folder to 0666 and then try generating the sitemap again.</p><p>If the issue remains unresolved, please post the error message in this <a target="_blank" href="http://wordpress.org/tags/google-image-sitemap?forum_id=10#postform">WordPress forum</a>.</p></div>';
+            echo '<div class="notice notice-error"><h2>Oops!</h2><p>The XML sitemap was generated successfully but the  plugin was unable to save the xml to your WordPress root folder at <strong>' .
+                $_SERVER['DOCUMENT_ROOT'] .
+                '</strong>.</p><p>Please ensure that the folder has appropriate <a href="http://codex.wordpress.org/Changing_File_Permissions" target="_blank">write permissions</a>.</p><p> You can either use the chmod command in Unix or use your FTP Manager to change the permission of the folder to 0666 and then try generating the sitemap again.</p><p>If the issue remains unresolved, please post the error message in this <a target="_blank" href="http://wordpress.org/tags/google-image-sitemap?forum_id=10#postform">WordPress forum</a>.</p></div>';
 
             exit();
         }
 
-        $sitemapurl = get_bloginfo('url') . "/sitemap-image.xml";
-?>
+        $sitemapurl = get_bloginfo('url') . '/sitemap-image.xml';
+        ?>
 
 
         <div class="wrap">
@@ -84,7 +84,7 @@ function image_sitemap_generate()
         </div>
     <?php
     } else {
-    ?>
+         ?>
 
         <div class="wrap">
             <h1>XML Sitemap for Images</h1>
@@ -104,18 +104,20 @@ function image_sitemap_loop()
 {
     global $wpdb;
 
-    $posts = $wpdb->get_results("SELECT id, post_parent, post_content, guid, post_type FROM $wpdb->posts wposts WHERE ((wposts.post_type = 'post') AND (wposts.post_status='publish')) OR ((wposts.post_type = 'page') AND (wposts.post_status='publish')) OR ((wposts.post_type = 'attachment') AND (wposts.post_status='inherit') AND ((wposts.post_mime_type = 'image/jpg') OR (wposts.post_mime_type = 'image/gif') OR (wposts.post_mime_type = 'image/jpeg') OR (wposts.post_mime_type = 'image/png')))");
+    $posts = $wpdb->get_results(
+        "SELECT id, post_parent, post_content, guid, post_type FROM $wpdb->posts wposts WHERE ((wposts.post_type = 'post') AND (wposts.post_status='publish')) OR ((wposts.post_type = 'page') AND (wposts.post_status='publish')) OR ((wposts.post_type = 'attachment') AND (wposts.post_status='inherit') AND ((wposts.post_mime_type = 'image/jpg') OR (wposts.post_mime_type = 'image/gif') OR (wposts.post_mime_type = 'image/jpeg') OR (wposts.post_mime_type = 'image/png')))"
+    );
 
     if (empty($posts)) {
         return false;
     } else {
-        $xml  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $xml .= '<!-- Created by (http://wordpress.org/extend/plugins/google-image-sitemap/) extended version (https://t3hwin.com/) -->' . "\n";
-        $xml .= '<!-- Generated-on="' . date("F j, Y, g:i a") . '" -->' . "\n";
+        $xml .= '<!-- Generated-on="' . date('F j, Y, g:i a') . '" -->' . "\n";
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
 
         foreach ($posts as $post) {
-            if ($post->post_type == "attachment") {
+            if ($post->post_type == 'attachment') {
                 if ($post->post_parent != 0) {
                     $post_images = wp_get_attachment_image_src($post->id, 'full');
                     $post_image = $post_images[0];
@@ -128,23 +130,23 @@ function image_sitemap_loop()
 
         foreach ($images as $k => $image_list) {
             $permalink = get_permalink($k);
-            $img = "";
+            $img = '';
 
             if (!empty($permalink)) {
                 foreach ($image_list as $key => $value) {
-                    $img .= "<image:image><image:loc>" . $value[1] . "</image:loc><image:title>" . $value[0] . "</image:title></image:image>";
+                    $img .= '<image:image><image:loc>' . $value[1] . '</image:loc><image:title>' . $value[0] . '</image:title></image:image>';
                 }
 
-                $xml .= "<url><loc>" . EscapeXMLEntities($permalink) . "</loc>" . $img . "</url>";
+                $xml .= '<url><loc>' . EscapeXMLEntities($permalink) . '</loc>' . $img . '</url>';
             }
         }
 
         $xml .= "\n</urlset>";
     }
 
-    $image_sitemap_url = $_SERVER["DOCUMENT_ROOT"] . '/sitemap-image.xml';
+    $image_sitemap_url = $_SERVER['DOCUMENT_ROOT'] . '/sitemap-image.xml';
 
-    if (IsImageSitemapWritable($_SERVER["DOCUMENT_ROOT"]) || IsImageSitemapWritable($image_sitemap_url)) {
+    if (IsImageSitemapWritable($_SERVER['DOCUMENT_ROOT']) || IsImageSitemapWritable($image_sitemap_url)) {
         if (file_put_contents($image_sitemap_url, $xml)) {
             return true;
         }
