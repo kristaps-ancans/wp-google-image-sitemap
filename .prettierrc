@@ -11,6 +11,8 @@
     "semi": true,
     "quoteProps": "consistent",
     "endOfLine": "lf",
+    "phpVersion": "7.1",
+    "braceStyle": "psr-2",
     "overrides": [
         {
             "files": "*.html",
