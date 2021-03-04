@@ -1,11 +1,23 @@
 <?php
-/*
-Plugin Name: Google XML Sitemap for Images
-Description: This plugin will generate a XML Image Sitemap for your WordPress blog. Open the <a href="tools.php?page=image-sitemap-generate-page">settings page</a> to create your image sitemap.
-Author: Kristaps Ancāns
-Version: 1.1.2
-Author URI: https://t3hwin.com
-*/
+
+/**
+ * @wordpress-plugin
+ * Plugin Name:       Google XML Sitemap for Images
+ * Plugin URI:        https://github.com/kristaps-ancans/wp-google-image-sitemap
+ * Description:       This plugin will generate a XML Image Sitemap for your WordPress blog. Open the <a href="tools.php?page=image-sitemap-generate-page">settings page</a> to create your image sitemap.
+ * Version:           1.1.2
+ * Author:            Kristaps Ancāns
+ * Author URI:        https://t3hwin.com
+ * License:           GPL-2.0+
+ * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * Text Domain:       plugin-name
+ */
+
+if (!defined('WPINC')) {
+    die();
+}
+
+define('PLUGIN_NAME_VERSION', '1.1.2');
 
 // Add Image Sitemap link in Tools list
 function image_sitemap_generate_page()
@@ -29,6 +41,23 @@ add_action('plugin_action_links_' . plugin_basename(__FILE__), 'image_sitemap_ac
 
 // Update image sitemap on post change
 add_filter('post_updated_messages', 'image_sitemap_loop');
+
+// Replace `post_updated_messages` with `cron crap`
+register_activation_hook(__FILE__, 'my_activation');
+
+function my_activation()
+{
+    if (!wp_next_scheduled('my_hourly_event')) {
+        wp_schedule_event(time(), 'hourly', 'my_hourly_event');
+    }
+}
+
+add_action('my_hourly_event', 'do_this_hourly');
+
+function do_this_hourly()
+{
+    // do something every hour
+}
 
 /* @author  VJTD3 <http://www.VJTD3.com> */
 function IsImageSitemapWritable($filename)
